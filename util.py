@@ -35,6 +35,10 @@ def read_input_as_lines(filename='input'):
     return read_input_split(filename, '\n')
 
 
+def read_input_as_blocks(filename='input'):
+    return read_input_split(filename, '\n\n')
+
+
 def read_input_as_numbers(filename='input'):
     return list(map(lambda l: int(l), read_input_as_lines(filename=filename)))
 
@@ -44,7 +48,7 @@ def read_input_as_digit_grid(filename='input'):
 
 
 def read_input_as_passports(filename='input'):
-    return map(lambda p: p.strip(), read_input_split(filename, '\n\n'))
+    return map(lambda p: p.strip(), read_input_as_blocks(filename))
 
 
 @cache
