@@ -47,6 +47,10 @@ def read_input_as_digit_grid(filename='input'):
     return [list(map(int, list(line))) for line in (read_input_as_lines(filename=filename))]
 
 
+def read_input_as_string_grid(filename='input'):
+    return [list(line) for line in (read_input_as_lines(filename=filename))]
+
+
 def read_input_as_passports(filename='input'):
     return map(lambda p: p.strip(), read_input_as_blocks(filename))
 

@@ -19,5 +19,4 @@ class TestConfig(object):
     def setUp(self):
         while 'test' in os.getcwd() or 'puzzles' in os.getcwd():
             os.chdir('..')
-        print(os.getcwd())
         os.chdir(f'./puzzles/Day{self.day_n}')
