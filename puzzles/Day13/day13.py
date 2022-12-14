@@ -40,12 +40,13 @@ class MyList:
 
 
 def part1():
-    blocks = read_input_as_blocks()
+    blocks = read_input_as_blocks(filename='inputLisa')
     indices_in_the_right_order = []
     for i, block in enumerate(blocks):
         list1, list2 = (eval(line) for line in safe_split(block))
         if MyList(list1) < MyList(list2):
             indices_in_the_right_order.append(i + 1)
+    print(indices_in_the_right_order)
     return sum(indices_in_the_right_order)
 
 
@@ -60,5 +61,9 @@ def part2():
 
 
 if __name__ == '__main__':
+    list1 = MyList(eval('[[6,[[0],[6,7],[4,10,8,4,1]],1,[[2,6],0,[4,6,2,3],9]]]'))
+    list2 = MyList(eval('[[10,[7],6]]'))
+
+    list1 < list2
     print(part1())
     print(part2())

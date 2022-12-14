@@ -1,61 +1,82 @@
+from typing import Dict, List, Tuple
+
 from util import read_input_as_string_grid, enumerate_matrix, get_neighbour_coords_in_matrix
 
 
 class Vertex:
-    def __init__(self, node):
-        self.id = node
-        self.outgoing_edges = {}
-        self.incoming_edges = {}
-        self.distance = 1_000_000
+    def __init__(self, name):
+        self.name = name
+        self.outgoing_edges: Dict[Vertex, int] = {}
+        self.incoming_edges: Dict[Vertex, int] = {}
+        # self.distance = 1_000_000
+        self.distance_to_node: Dict[Vertex, int] = {self: 0}
+        self.path_to_node: Dict[Vertex, List[Vertex]] = {self: [self]}
         self.visited = False
         self.previous = None
 
-    def reset(self):
-        self.distance = 1_000_000
-        self.visited = False
-        self.previous = None
+    def get_distance_to_node(self, node):
+        return self.distance_to_node.get(node, 10_000_000)
 
     def add_neighbor(self, neighbor, weight=0):
         self.outgoing_edges[neighbor] = weight
         neighbor.incoming_edges[self] = weight
 
+    def __repr__(self):
+        return self.name
+
     def __str__(self):
-        return f'{self.id} outgoing edges: {[x.id for x in self.outgoing_edges]}'
+        return f'{self.name} outgoing edges: {[x.name for x in self.outgoing_edges]}'
 
 
 class Graph:
     def __init__(self):
-        self.vert_dict = {}
+        self.vertices = set()
         self.num_vertices = 0
 
-    def reset(self):
-        for v in self.vert_dict.values():
-            v.reset()
-
     def __iter__(self):
-        return iter(self.vert_dict.values())
+        return iter(self.vertices)
 
-    def add_vertex(self, node):
+    def add_vertex(self, name: str):
         self.num_vertices += 1
-        new_vertex = Vertex(node)
-        self.vert_dict[node] = new_vertex
+        new_vertex = Vertex(name)
+        self.vertices.add(new_vertex)
         return new_vertex
 
-    def add_edge(self, frm, to, cost=0):
-        if frm not in self.vert_dict:
-            self.add_vertex(frm)
-        if to not in self.vert_dict:
-            self.add_vertex(to)
-        self.vert_dict[frm].add_neighbor(self.vert_dict[to], cost)
+    def add_edge(self, frm: Vertex, to: Vertex, cost=0):
+        frm.add_neighbor(to, cost)
 
 
 def shortest(vertex):
     current = vertex
-    path = [vertex.id]
+    path = [vertex.name]
     while current.previous:
         current = current.previous
-        path.append(current.id)
+        path.append(current.name)
     return path
+
+
+def dijkstra2(graph: Graph, start: Vertex, reverse=False):
+    current_node = start
+    while True:
+        current_node.visited = True
+        edges_to_search = current_node.incoming_edges if reverse else current_node.outgoing_edges
+        for next_node, edge_distance in edges_to_search.items():
+            next_node: Vertex
+            if next_node.visited:
+                continue
+            current_distance = start.get_distance_to_node(current_node)
+            new_distance = current_distance + edge_distance
+            if new_distance < start.get_distance_to_node(next_node):
+                start.distance_to_node[next_node] = new_distance
+                path = start.path_to_node[current_node] + [next_node]
+                start.path_to_node[next_node] = path
+                for i, node_in_path in enumerate(path):
+                    node_in_path.path_to_node[next_node] = path[i:]
+                    node_in_path.distance_to_node[next_node] = new_distance - start.distance_to_node[node_in_path]
+        unvisited_queue = sorted([v for v in graph if not v.visited], key=lambda v: start.get_distance_to_node(v))
+        if len(unvisited_queue) == 0:
+            break
+        current_node = unvisited_queue[0]
 
 
 def dijkstra(graph, start, reverse=False):
@@ -91,36 +112,34 @@ def can_go_from_node_to_node(value1, value2):
 def parse():
     g = Graph()
     grid = read_input_as_string_grid()
-    node_map = {}
+    node_map: Dict[Tuple[int, int], Vertex] = {}
     for (y, x), node in enumerate_matrix(grid):
-        node_str = f'{node}({x},{y})'
-        g.add_vertex(node_str)
-        node_map[(y, x)] = node_str
+        node_map[(y, x)] = g.add_vertex(f'{node}({x},{y})')
     for (y, x), node in enumerate_matrix(grid):
-        node_str = node_map[(y, x)]
+        vertex = node_map[(y, x)]
         for (y_n, x_n) in get_neighbour_coords_in_matrix(grid, (y, x)):
-            neighbour_str = node_map[(y_n, x_n)]
-            if can_go_from_node_to_node(node_str, neighbour_str):
-                g.add_edge(node_str, neighbour_str, 1)
-            if can_go_from_node_to_node(neighbour_str, node_str):
-                g.add_edge(neighbour_str, node_str, 1)
+            neighbour_vertex = node_map[(y_n, x_n)]
+            if can_go_from_node_to_node(vertex.name, neighbour_vertex.name):
+                g.add_edge(vertex, neighbour_vertex, 1)
+            if can_go_from_node_to_node(neighbour_vertex.name, vertex.name):
+                g.add_edge(neighbour_vertex, vertex, 1)
     return g
 
 
 def part1():
     g = parse()
-    start = list({k: v for k, v in g.vert_dict.items() if 'S' in k}.values())[0]
+    start = list({v for v in g.vertices if 'S' in v.name})[0]
     dijkstra(g, start)
-    target = list({k: v for k, v in g.vert_dict.items() if 'E' in k}.values())[0]
+    target = list({v for v in g.vertices if 'E' in v.name})[0]
     path = shortest(target)
     return len(path) - 1
 
 
 def part2():
     g = parse()
-    start = list({k: v for k, v in g.vert_dict.items() if 'E' in k}.values())[0]
+    start = list({v for v in g.vertices if 'E' in v.name})[0]
     dijkstra(g, start, reverse=True)
-    targets = list({k: v for k, v in g.vert_dict.items() if 'a' in k or 'S' in k}.values())
+    targets = list({v for v in g.vertices if 'a' in v.name or 'S' in v.name})
     min_distance = None
     for target in targets:
         path = shortest(target)
@@ -133,5 +152,8 @@ def part2():
 
 
 if __name__ == '__main__':
-    print(part1())
-    print(part2())
+    g = parse()
+    start = list({v for v in g.vertices if 'S' in v.name})[0]
+    dijkstra2(g, start)
+    # print(part1())
+    # print(part2())

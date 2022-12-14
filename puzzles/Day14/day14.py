@@ -1,5 +1,9 @@
+from util import read_input_as_string_grid
+
+
 def part1():
-    pass
+    grid = read_input_as_string_grid()
+
 
 
 def part2():
