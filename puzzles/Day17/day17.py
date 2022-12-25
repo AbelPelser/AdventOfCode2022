@@ -1,9 +1,13 @@
+from puzzles.Day17.tetris_simulator import TetrisSimulator
+from util import read_input
+
+
 def part1():
-    pass
+    return TetrisSimulator(read_input(), goal=2022).run()
 
 
 def part2():
-    pass
+    return TetrisSimulator(read_input(), goal=1_000_000_000_000).run()
 
 
 if __name__ == '__main__':

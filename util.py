@@ -1,3 +1,4 @@
+import itertools
 import time
 from functools import cache, reduce
 
@@ -67,6 +68,54 @@ def convert_hex_into_bit_string(hex_string):
 @cache
 def string_to_digits(string):
     return list(map(int, list(string)))
+
+
+def split_set(start_set: set):
+    for i in range(len(start_set)):
+        for subset in itertools.combinations(start_set, i):
+            subset = set(subset)
+            yield subset, start_set.difference(subset)
+
+
+def get_2_subsets_without_overlap(start_set: set):
+    for subset, remaining in split_set(start_set):
+        for i in range(len(remaining)):
+            for subset2 in itertools.combinations(remaining, i):
+                yield subset, subset2
+
+
+def get_leftmost_point(set_of_points):
+    return min(set_of_points, key=lambda t: t[0])[0]
+
+
+def get_rightmost_point(set_of_points):
+    return max(set_of_points, key=lambda t: t[0])[0]
+
+
+def get_upmost_point(set_of_points):
+    return max(set_of_points, key=lambda t: t[1])[1]
+
+
+def get_downmost_point(set_of_points):
+    return min(set_of_points, key=lambda t: t[1])[1]
+
+
+def get_extremes(set_of_points: set[tuple[int, ...]]):
+    assert len(set_of_points) > 0
+    n_dimensions = len(next(iter(set_of_points)))
+    minimums = []
+    maximums = []
+    for i in range(n_dimensions):
+        minimums.append(min(set_of_points, key=lambda t: t[i])[i])
+        maximums.append(max(set_of_points, key=lambda t: t[i])[i])
+    return tuple(minimums), tuple(maximums)
+
+def get_neighbour_coords(coord):
+    coord = tuple(coord)
+    for i in range(len(coord)):
+        for delta in (-1, 1):
+            value = coord[i] + delta
+            yield coord[:i] + (value,) + coord[i + 1:]
 
 
 def get_neighbour_coords_in_matrix(grid, coord):

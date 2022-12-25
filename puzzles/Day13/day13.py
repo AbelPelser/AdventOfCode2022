@@ -40,13 +40,12 @@ class MyList:
 
 
 def part1():
-    blocks = read_input_as_blocks(filename='inputLisa')
+    blocks = read_input_as_blocks()
     indices_in_the_right_order = []
     for i, block in enumerate(blocks):
         list1, list2 = (eval(line) for line in safe_split(block))
         if MyList(list1) < MyList(list2):
             indices_in_the_right_order.append(i + 1)
-    print(indices_in_the_right_order)
     return sum(indices_in_the_right_order)
 
 
