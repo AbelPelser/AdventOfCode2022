@@ -1,5 +1,3 @@
-import math
-
 from gmpy2 import digits
 
 from util import read_input_as_lines
@@ -27,12 +25,7 @@ def normal_to_snafu(number):
 
 
 def part1():
-    s = 0
-    to_subtract = int('22222', 5)
-    for line in read_input_as_lines():
-        s += snafu_to_normal(line)
-        assert normal_to_snafu(snafu_to_normal(line)) == line, f'{normal_to_snafu(snafu_to_normal(line))} =/= {line}'
-    return normal_to_snafu(s)
+    return normal_to_snafu(sum(snafu_to_normal(line) for line in read_input_as_lines()))
 
 
 def part2():
