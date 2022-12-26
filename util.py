@@ -110,6 +110,7 @@ def get_extremes(set_of_points: set[tuple[int, ...]]):
         maximums.append(max(set_of_points, key=lambda t: t[i])[i])
     return tuple(minimums), tuple(maximums)
 
+
 def get_neighbour_coords(coord):
     coord = tuple(coord)
     for i in range(len(coord)):
