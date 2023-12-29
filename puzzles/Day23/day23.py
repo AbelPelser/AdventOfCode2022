@@ -8,7 +8,6 @@ DIRECTIONS = [NORTH, SOUTH, WEST, EAST]
 class Elf:
     def __init__(self, position):
         self.position = position
-        # self.direction = 3
 
 
 class Map:

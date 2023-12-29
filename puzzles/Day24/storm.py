@@ -32,7 +32,7 @@ class Storm:
             start_x = grid_width - 2
             return Storm((start_x, y), (x, y), movement_delta, (0, y))
         elif storm_type == '>':
-            end_x_excl = grid_width - 1  # wall
+            end_x_excl = grid_width - 1  # walls
             return Storm((1, y), (x, y), movement_delta, (end_x_excl, y))
         elif storm_type == '^':
             start_y = grid_height - 2
